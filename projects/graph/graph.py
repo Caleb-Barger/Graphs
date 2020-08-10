@@ -19,7 +19,7 @@ class Graph:
         """
         Add a directed edge to the graph.
         """
-        if self.vertices[v1] and self.vertices[v2]:
+        if v1 in self.vertices and v2 in self.vertices:
             self.vertices[v1].add(v2)
         else:
             raise IndexError("Invlaid vertex check your args")
@@ -94,27 +94,27 @@ class Graph:
         This should be done using recursion.
         """
         # base case(s)?
-            # if stack is empty and visited is not empty
-            if s.size() == 0:
-                return 
+        # if stack is empty and visited is not empty
+        if s.size() == 0:
+            return 
 
         # how are we getting to that case?
-            # if visited is empty
-            if visited == set()
-                # push starting vert onto stack
-                s.push(starting_vertex)
-            # pop vert
-            v = s.pop()
-            # if we have not visited the current vert
-            if v not in visited:
-                # print vertex
-                print(v)
-                # add v to visited
-                visited.add(v)
-                # for vert's neighbors
-                for n in self.get_neighbors():  
-                    # call self
-                    self.dft_recursive(n, visited, s)
+        # if visited is empty
+        if visited == {}:
+            # push starting vert onto stack
+            s.push(starting_vertex)
+        # pop vert
+        v = s.pop()
+        # if we have not visited the current vert
+        if v not in visited:
+            # print vertex
+            print(v)
+            # add v to visited
+            visited.add(v)
+            # for vert's neighbors
+            for n in self.get_neighbors():  
+                # call self
+                self.dft_recursive(n, visited, s)
 
 
     def bfs(self, starting_vertex, destination_vertex):
@@ -123,7 +123,33 @@ class Graph:
         starting_vertex to destination_vertex in
         breath-first order.
         """
-        pass  # TODO
+        # make a queue
+        q = Queue()
+
+        # add a tuple of starting vertex
+        q.enqueue([starting_vertex])
+
+        # make an empty set (visited)
+        visited = set()
+
+        # while the queue is not empty
+        while q.size() > 0:
+            # deqeue path
+            path = q.dequeue()
+            # if that path has not been visited
+            if path not in visited:
+                # if last item is destination
+                if path[-1] == destination_vertex:
+                    # return that path
+                    return path
+                # otherwise add it to the visited paths
+                visited.add(path)
+                # enqueue path's neighbors
+                for n in self.get_neighbors(path[-1]):
+                    temp_path = [:]
+                    temp_path.append(n)
+                    q.enqueue(temp_path)
+
 
     def dfs(self, starting_vertex, destination_vertex):
         """
