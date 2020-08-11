@@ -28,15 +28,7 @@ def earliest_ancestor(ancestors, v, parents=None, distance=1):
     values = [p.distance for p in parents]
     greatest_distance = max(values)
     
-    contenders = []
-    
     for p in parents:
         if p.distance == greatest_distance:
-            contenders.append(p)
+            return p.v
             
-    r = max([p.v for p in contenders])
-    
-    return r
-
-test_ancestors = [(1, 3), (2, 3), (3, 6), (5, 6), (5, 7), (4, 5), (4, 8), (8, 9), (11, 8), (10, 1)]
-earliest_ancestor(test_ancestors, 6)
