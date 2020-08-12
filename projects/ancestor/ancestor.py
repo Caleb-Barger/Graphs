@@ -19,8 +19,6 @@ def earliest_ancestor(ancestors, v, parents=None, distance=1):
             distance += 1
             # call self with new v
             return earliest_ancestor(ancestors, parent_ref.v, parents, distance)
-    # if no parent was found return None
-    # return None
     
     if len(parents) == 0:
         return -1
@@ -31,4 +29,3 @@ def earliest_ancestor(ancestors, v, parents=None, distance=1):
     for p in parents:
         if p.distance == greatest_distance:
             return p.v
-            
