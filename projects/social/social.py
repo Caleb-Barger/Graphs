@@ -77,6 +77,8 @@ class SocialGraph:
             friendships = possible_friendships[i]
             self.add_friendship(friendships[0], friendships[1])
 
+    def get_neighbors(v):
+        return self.friendships[v] # i think this is all this needs to do?
 
     def get_all_social_paths(self, user_id):
         """
@@ -90,7 +92,29 @@ class SocialGraph:
         visited = {}  # Note that this is a dictionary, not a set
 
         # initalize a queue
-        #  
+        q = Queue()
+        # start quqeue with the inital user 
+        q.enqueue([user_id])
+        # while the queue is not empty
+        while q.size() > 0:
+            # deque from queue and store as path
+            path = q.dequeue()
+            # grab the last person from path
+            v = path[-1]
+            # if that person is not in the visted path
+            if v not in visited:
+                # add that person to the visited dict
+                visited[v] = path
+
+                # iterate over the persons neighbors
+                for neighbor in get_neighbors(v):
+                    # make a copy of the current path
+                    path_copy = list(path)
+                    # add the neighbor to the end of the copied path
+                    path_copy.append(neighbor)
+                    # add the copied path to the queue
+                    q.enqueue(path_copy)
+
 
         return visited
 
