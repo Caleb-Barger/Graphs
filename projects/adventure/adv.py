@@ -2,7 +2,6 @@ from room import Room
 from player import Player
 from world import World
 
-
 from util import Stack 
 
 import random, time
@@ -10,7 +9,6 @@ from ast import literal_eval
 
 # Load world
 world = World()
-
 
 # You may uncomment the smaller graphs for development and testing purposes.
 map_file = "maps/test_line.txt"
@@ -30,59 +28,45 @@ player = Player(world.starting_room)
 
 # Fill this out with directions to walk
 # traversal_path = ['n', 'n']
+
 traversal_path = []
-graph = {}
 
-# initalize a stack and the first room
+# graph = {}
+
+visited = set()
 s = Stack()
-current_room = player.current_room.id
 
-# populate the stack and graph with starting room info
-graph[current_room] = {k:'?' for k in player.current_room.get_exits()}
+for d in player.current_room.get_exits():
+    s.push(d)
 
-for k in graph[current_room].keys():
-    s.push(k)
-
-def link_rooms(prev_room, current_room, d):
-    graph[prev_room][d] = current_room
-
-    if d == 'n':
-        dtc = 's' # direction to connect
-    elif d == 's':
-        dtc = 'n'
-    elif d == 'e':
-        dtc = 'w'
-    elif d == 'w':
-        dtc = 'e'
-
-    graph[current_room][dtc] = prev_room
+visited.add(player.current_room.id)
 
 while s.size() > 0:
+    print(s.stack)
+    print(player.current_room.id)
     d = s.pop()
 
-    if graph[current_room][d] == '?':
+    # if this entry is not already in graph make an entry
+    # if player.current_room.id not in graph:
+    #     graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
 
-        # ok just called explore with North and room 0
-        prev_room = current_room # store refrence to the prev room
+    player.travel(d) 
+    traversal_path.append(d)
 
-        player.travel(d) # move player
-        
-        traversal_path.append(d) # add the step to path
-        
-        current_room = player.current_room.id # assign new current_room
-        
-        # if the current room does not have an entry in the graph build one
-        if current_room not in graph:
-            graph[current_room] = {k:'?' for k in player.current_room.get_exits()}
+    if player.current_room.id not in visited:
+        held_item = None
+        for e in player.current_room.get_exits():
+            if e == d:
+                held_item = e
+            else:
+                s.push(e)
+                
+        if held_item:
+            s.push(held_item)
 
-        link_rooms(prev_room, current_room, d) # updates the graph
 
-        # look at new rooms neighbors
-        for k in graph[current_room].keys():
-            s.push(k)
+        visited.add(player.current_room.id)
 
-#    print(traversal_path)
-    print(s.stack)
 
 
 
