@@ -1,6 +1,8 @@
 from room import Room
 from player import Player
 from world import World
+
+
 from util import Stack 
 
 import random, time
@@ -11,8 +13,8 @@ world = World()
 
 
 # You may uncomment the smaller graphs for development and testing purposes.
-# map_file = "maps/test_line.txt"
-map_file = "maps/test_cross.txt"
+map_file = "maps/test_line.txt"
+# map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
 # map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
@@ -33,75 +35,56 @@ graph = {}
 
 # initalize a stack and the first room
 s = Stack()
-r = player.current_room.id
+current_room = player.current_room.id
 
 # populate the stack and graph with starting room info
-graph[r] = {k:'?' for k in player.current_room.get_exits()}
+graph[current_room] = {k:'?' for k in player.current_room.get_exits()}
 
-for k in graph[r].keys():
+for k in graph[current_room].keys():
     s.push(k)
 
-def add_way_back(d):
+def link_rooms(prev_room, current_room, d):
+    graph[prev_room][d] = current_room
+
     if d == 'n':
-        s.push('s')
-    if d == 's':
-        s.push('n')
-    if d == 'e':
-        s.push('w')
-    if d == 'w':
-        s.push('e')
+        dtc = 's' # direction to connect
+    elif d == 's':
+        dtc = 'n'
+    elif d == 'e':
+        dtc = 'w'
+    elif d == 'w':
+        dtc = 'e'
 
-# while the stack is not empty keep exploring
+    graph[current_room][dtc] = prev_room
+
 while s.size() > 0:
-    direction = s.pop()
-    # add this movement to the path
-    traversal_path.append(direction)
-    prev_room = player.current_room.id
+    d = s.pop()
 
-    player.travel(direction) # move the player
+    if graph[current_room][d] == '?':
 
-    # ok now I need the new rooms id
-    r = player.current_room.id
+        # ok just called explore with North and room 0
+        prev_room = current_room # store refrence to the prev room
 
-    # if the entry does not exist populate the graph
-    if r not in graph:
-        graph[r] = {k:'?' for k in player.current_room.get_exits()}
+        player.travel(d) # move player
+        
+        traversal_path.append(d) # add the step to path
+        
+        current_room = player.current_room.id # assign new current_room
+        
+        # if the current room does not have an entry in the graph build one
+        if current_room not in graph:
+            graph[current_room] = {k:'?' for k in player.current_room.get_exits()}
 
-    # update the graph for both rooms
-    graph[prev_room][direction] = r
-   
-    if direction == 'n':
-        graph[r]['s'] = prev_room
-    elif direction == 's':
-        graph[r]['n'] = prev_room
-    elif direction == 'e':
-        graph[r]['w'] = prev_room
-    else:
-        graph[r]['e'] = prev_room
+        link_rooms(prev_room, current_room, d) # updates the graph
 
-    # only push new direction onto the stack
-    push_count = 0
-    for d in player.current_room.get_exits():
-        if graph[r][d] == '?':
-            s.push(d)
-            push_count += 1
-            backtracking = False
+        # look at new rooms neighbors
+        for k in graph[current_room].keys():
+            s.push(k)
 
-    if push_count == 0 and not backtracking:
-        backtracking = True
-    
-    if '?' not in graph[r].values() and not backtracking:
-        s.pop()
-        add_way_back(direction)
-        add_way_back(direction)
+#    print(traversal_path)
+    print(s.stack)
 
-    
-    time.sleep(3)
-    print(f"STACK - {s.stack}")
-    print(f"graph - {graph}")
-    print(f"ROOM - {player.current_room.id}")
-    
-    print("\n")
+
 
 # TRAVERSAL TEST
 visited_rooms = set()
