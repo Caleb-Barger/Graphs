@@ -14,8 +14,8 @@ world = World()
 # map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-map_file = "maps/test_loop_fork.txt"
-# map_file = "maps/main_maze.txt"
+# map_file = "maps/test_loop_fork.txt"
+map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
 room_graph=literal_eval(open(map_file, "r").read())
@@ -44,10 +44,11 @@ visited.add(player.current_room.id)
 graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
 
 while s.size() > 0:
-    print(s.stack)
+    # print(s.stack)
     print(player.current_room.id)
-    print()
-    time.sleep(.4)
+    # print()
+    # print(traversal_path)
+    # time.sleep(.4)
     # print(graph)
 
     d = s.pop()
@@ -78,32 +79,13 @@ while s.size() > 0:
         held_item = None
         
         for k, v in graph[player.current_room.id].items():
-            # if v == '?':
-            #     s.push(k)
             if v == '?':
                 held_item = k
             else:
                 s.push(k)
 
-
-        # for e in player.current_room.get_exits():
-        #     # if e == d or e == 'e' and d == 'w' or e == 'w' and d == 'e':
-        #     #     held_item = e
-        #     if e == d:
-        #         held_item = e
-        #     else:
-        #         s.push(e)
-
         if held_item:
             s.push(held_item)
-
-        
-        # if s.stack[-2] == 's' or s.stack[-2] == 'n' and s.stack[-1] != 's' and s.size() > 1:
-        #     s.stack[-1], s.stack[-2] = s.stack[-2], s.stack[-1]
-        
-        
-
-
 
         visited.add(player.current_room.id)
 
@@ -114,19 +96,17 @@ while s.size() > 0:
 
     # check if and '?' exist in the entire graph
     else:
-        should_be_empty = []
-        for k in graph.keys():
-            if '?' in graph[k].values():
-                should_be_empty.append(1)
+        # smaller maze tests...
+        # should_be_empty = []
+        # for k in graph.keys():
+        #     if '?' in graph[k].values():
+        #         should_be_empty.append(1)
         
-        if len(should_be_empty) == 0:
+        # if len(should_be_empty) == 0:
+        #     break
+
+        if len(graph) == 500:
             break
-            
-
-
-
-
-
 
 
 # TRAVERSAL TEST
