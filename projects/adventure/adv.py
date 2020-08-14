@@ -11,10 +11,10 @@ from ast import literal_eval
 world = World()
 
 # You may uncomment the smaller graphs for development and testing purposes.
-map_file = "maps/test_line.txt"
+# map_file = "maps/test_line.txt"
 # map_file = "maps/test_cross.txt"
 # map_file = "maps/test_loop.txt"
-# map_file = "maps/test_loop_fork.txt"
+map_file = "maps/test_loop_fork.txt"
 # map_file = "maps/main_maze.txt"
 
 # Loads the map into a dictionary
@@ -31,7 +31,7 @@ player = Player(world.starting_room)
 
 traversal_path = []
 
-# graph = {}
+graph = {}
 
 visited = set()
 s = Stack()
@@ -41,31 +41,90 @@ for d in player.current_room.get_exits():
 
 visited.add(player.current_room.id)
 
+graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
+
 while s.size() > 0:
     print(s.stack)
     print(player.current_room.id)
+    print()
+    time.sleep(.4)
+    # print(graph)
+
     d = s.pop()
 
-    # if this entry is not already in graph make an entry
-    # if player.current_room.id not in graph:
-    #     graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
-
+    prev_room = player.current_room.id
     player.travel(d) 
     traversal_path.append(d)
 
+    # if this entry is not already in graph make an entry
+    if player.current_room.id not in graph:
+        graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
+
+    # update the graph
+    graph[prev_room][d] = player.current_room.id
+
+    if d == 'n':
+        dta = 's'
+    if d == 's':
+        dta = 'n'
+    if d == 'e':
+        dta = 'w'
+    if d == 'w':
+        dta = 'e'
+
+    graph[player.current_room.id][dta] = prev_room
+
     if player.current_room.id not in visited:
         held_item = None
-        for e in player.current_room.get_exits():
-            if e == d:
-                held_item = e
+        
+        for k, v in graph[player.current_room.id].items():
+            # if v == '?':
+            #     s.push(k)
+            if v == '?':
+                held_item = k
             else:
-                s.push(e)
-                
+                s.push(k)
+
+
+        # for e in player.current_room.get_exits():
+        #     # if e == d or e == 'e' and d == 'w' or e == 'w' and d == 'e':
+        #     #     held_item = e
+        #     if e == d:
+        #         held_item = e
+        #     else:
+        #         s.push(e)
+
         if held_item:
             s.push(held_item)
 
+        
+        # if s.stack[-2] == 's' or s.stack[-2] == 'n' and s.stack[-1] != 's' and s.size() > 1:
+        #     s.stack[-1], s.stack[-2] = s.stack[-2], s.stack[-1]
+        
+        
+
+
 
         visited.add(player.current_room.id)
+
+    elif '?' in graph[player.current_room.id].values():
+        for k, v in graph[player.current_room.id].items():
+            if v == '?':
+                s.push(k)
+
+    # check if and '?' exist in the entire graph
+    else:
+        should_be_empty = []
+        for k in graph.keys():
+            if '?' in graph[k].values():
+                should_be_empty.append(1)
+        
+        if len(should_be_empty) == 0:
+            break
+            
+
+
+
 
 
 
