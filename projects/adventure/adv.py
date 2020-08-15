@@ -32,81 +32,63 @@ player = Player(world.starting_room)
 traversal_path = []
 
 graph = {}
-
-visited = set()
+# visited = set()
 s = Stack()
 
-for d in player.current_room.get_exits():
-    s.push(d)
-
-visited.add(player.current_room.id)
-
+# populate the graph with the first room
 graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
 
-while s.size() > 0:
-    # print(s.stack)
-    print(player.current_room.id)
-    # print()
-    # print(traversal_path)
-    # time.sleep(.4)
-    # print(graph)
+def op_dir(d):
+    if d == 'n':
+        dtt = 's'
+    if d == 's':
+        dtt = 'n'
+    if d == 'e':
+        dtt = 'w'
+    if d == 'w':
+        dtt = 'e'
 
+    return dtt
+
+# iterate through this graph entry and add question marks directions to the stack 
+# but first add the way to get back from that particular direction
+for k, v in graph[player.current_room.id].items():
+    if v == '?':
+        # first push oposite direction 
+        # then push direction
+        s.push(op_dir(k))
+        s.push(k)
+
+while s.size() > 0:
+    print(s.stack)
     d = s.pop()
 
     prev_room = player.current_room.id
-    player.travel(d) 
+    player.travel(d)
     traversal_path.append(d)
 
-    # if this entry is not already in graph make an entry
     if player.current_room.id not in graph:
         graph[player.current_room.id] = {k:'?' for k in player.current_room.get_exits()}
-
-    # update the graph
+    
+    # sync up the rooms
     graph[prev_room][d] = player.current_room.id
+    graph[player.current_room.id][op_dir(d)] = prev_room
 
-    if d == 'n':
-        dta = 's'
-    if d == 's':
-        dta = 'n'
-    if d == 'e':
-        dta = 'w'
-    if d == 'w':
-        dta = 'e'
+    for k, v in graph[player.current_room.id].items():
+        if v == '?':
+            s.push(op_dir(k))
+            s.push(k)
 
-    graph[player.current_room.id][dta] = prev_room
+    finished = True
+    for e in graph.keys():
+        if '?' in graph[e].values():
+            finished = False
 
-    if player.current_room.id not in visited:
-        held_item = None
-        
-        for k, v in graph[player.current_room.id].items():
-            if v == '?':
-                held_item = k
-            else:
-                s.push(k)
+    if finished:
+        break
+            
 
-        if held_item:
-            s.push(held_item)
-
-        visited.add(player.current_room.id)
-
-    elif '?' in graph[player.current_room.id].values():
-        for k, v in graph[player.current_room.id].items():
-            if v == '?':
-                s.push(k)
-
-    # check if and '?' exist in the entire graph
-    else:
-        # smaller maze tests...
-        # should_be_empty = []
-        # for k in graph.keys():
-        #     if '?' in graph[k].values():
-        #         should_be_empty.append(1)
-        
-        # if len(should_be_empty) == 0:
-        #     break
-
-        if len(graph) == 500:
-            break
+    
 
 
 # TRAVERSAL TEST
